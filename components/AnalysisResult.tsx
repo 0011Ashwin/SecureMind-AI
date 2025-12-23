@@ -25,9 +25,14 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({ type, data }) =>
           <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
             {isPhishing ? 'Threat Type' : 'Suspected Attack'}
           </h4>
-          <p className="text-xl font-semibold text-slate-900">
-            {isPhishing ? phishingData.threat_type : logData.potential_attack}
-          </p>
+          <div className="flex items-center space-x-2">
+            {!isPhishing && (
+              <span className={`w-3 h-3 rounded-full ${logData.suspicious_activity ? 'bg-red-500' : 'bg-emerald-500'}`} title={logData.suspicious_activity ? 'Suspicious activity detected' : 'Normal activity'}></span>
+            )}
+            <p className="text-xl font-semibold text-slate-900">
+              {isPhishing ? phishingData.threat_type : logData.possible_attack}
+            </p>
+          </div>
         </div>
 
         <div>
@@ -37,25 +42,12 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({ type, data }) =>
           </div>
         </div>
 
-        {!isPhishing && logData.detected_patterns && (
-          <div>
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Detected Anomalies</h4>
-            <div className="flex flex-wrap gap-2">
-              {logData.detected_patterns.map((pattern, idx) => (
-                <span key={idx} className="bg-slate-200 text-slate-700 px-3 py-1 rounded text-sm font-medium">
-                  {pattern}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div>
           <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
-            {isPhishing ? 'Recommended Safety Actions' : 'Mitigation Steps'}
+            Recommended Actions
           </h4>
           <ul className="space-y-3">
-            {(isPhishing ? phishingData.recommended_actions : logData.mitigation_steps).map((action, idx) => (
+            {data.recommended_actions.map((action, idx) => (
               <li key={idx} className="flex items-start space-x-3 text-slate-700">
                 <span className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">
                   {idx + 1}

@@ -7,7 +7,7 @@ const PHISHING_SCHEMA = {
   properties: {
     threat_type: {
       type: Type.STRING,
-      description: "The category of the threat (e.g., Phishing, Smishing, WhatsApp Scam, Fake Offer).",
+      description: "The category of the threat (e.g., phishing, impersonation, fake offer, malware, etc.).",
     },
     risk_level: {
       type: Type.STRING,
@@ -15,12 +15,12 @@ const PHISHING_SCHEMA = {
     },
     explanation: {
       type: Type.STRING,
-      description: "A simple, jargon-free explanation of why this is risky.",
+      description: "A simple, non-technical explanation of the risk.",
     },
     recommended_actions: {
       type: Type.ARRAY,
       items: { type: Type.STRING },
-      description: "Clear steps for the user to stay safe.",
+      description: "Clear and actionable safety steps for the user.",
     },
   },
   required: ["threat_type", "risk_level", "explanation", "recommended_actions"],
@@ -29,14 +29,13 @@ const PHISHING_SCHEMA = {
 const LOG_SCHEMA = {
   type: Type.OBJECT,
   properties: {
-    detected_patterns: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING },
-      description: "Key suspicious events found in the logs.",
+    suspicious_activity: {
+      type: Type.BOOLEAN,
+      description: "True if abnormal or suspicious patterns are identified.",
     },
-    potential_attack: {
+    possible_attack: {
       type: Type.STRING,
-      description: "The name of the suspected attack (e.g., Brute Force, Credential Stuffing).",
+      description: "The type of attack identified (e.g., Brute Force, Credential Stuffing).",
     },
     risk_level: {
       type: Type.STRING,
@@ -44,15 +43,15 @@ const LOG_SCHEMA = {
     },
     explanation: {
       type: Type.STRING,
-      description: "A simple explanation of the risk for non-technical users.",
+      description: "Findings explained in simple language for junior developers or students.",
     },
-    mitigation_steps: {
+    recommended_actions: {
       type: Type.ARRAY,
       items: { type: Type.STRING },
-      description: "Immediate steps to secure the system.",
+      description: "Immediate mitigation or preventive steps.",
     },
   },
-  required: ["detected_patterns", "potential_attack", "risk_level", "explanation", "mitigation_steps"],
+  required: ["suspicious_activity", "possible_attack", "risk_level", "explanation", "recommended_actions"],
 };
 
 export class GeminiService {
@@ -65,12 +64,26 @@ export class GeminiService {
   async analyzePhishing(content: string): Promise<PhishingAnalysis> {
     const response = await this.ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `You are an expert Cybersecurity Analyst. Analyze the following content (Email, SMS, or URL) for potential threats:
+      contents: `You are a cybersecurity analyst. 
+      Task: Analyze the following content for phishing or scam risk.
       
-      CONTENT:
-      "${content}"
+      Content:
+      """
+      ${content}
+      """
       
-      Respond strictly in JSON format following the schema. Use simple language that a non-technical person can understand. Avoid complex jargon.`,
+      Instructions:
+      - Determine if the content is malicious or safe.
+      - Classify the threat type.
+      - Assign a risk level: High, Medium, or Low.
+      - Explain the risk in simple, non-technical language.
+      - Suggest clear and actionable safety steps.
+      
+      Rules:
+      - Be conservative in classification.
+      - Do not exaggerate risk.
+      - Do not hallucinate facts.
+      - Explanation must be understandable by a non-technical user.`,
       config: {
         responseMimeType: "application/json",
         responseSchema: PHISHING_SCHEMA,
@@ -85,12 +98,25 @@ export class GeminiService {
   async analyzeLogs(logs: string): Promise<LogAnalysis> {
     const response = await this.ai.models.generateContent({
       model: "gemini-3-pro-preview",
-      contents: `You are a Senior Security Operations Center (SOC) Analyst. Analyze the following raw server/application logs for suspicious behavior or security incidents:
+      contents: `You are a cybersecurity log analysis expert.
+      Task: Analyze the following system logs for suspicious or malicious activity.
       
-      LOGS:
-      "${logs}"
+      Logs:
+      """
+      ${logs}
+      """
       
-      Explain the findings in a way that a junior developer or a student could understand. Suggest immediate mitigation steps. Respond strictly in JSON format.`,
+      Instructions:
+      - Identify abnormal or suspicious patterns.
+      - Infer possible attack types if applicable.
+      - Assign a risk level: High, Medium, or Low.
+      - Explain findings in simple language.
+      - Suggest mitigation or preventive steps.
+      
+      Rules:
+      - Do not assume attacks unless evidence exists.
+      - Avoid deep technical jargon.
+      - Keep explanations concise.`,
       config: {
         thinkingConfig: { thinkingBudget: 16384 },
         responseMimeType: "application/json",

@@ -9,11 +9,11 @@ export interface PhishingAnalysis {
 }
 
 export interface LogAnalysis {
-  detected_patterns: string[];
-  potential_attack: string;
+  suspicious_activity: boolean;
+  possible_attack: string;
   risk_level: RiskLevel;
   explanation: string;
-  mitigation_steps: string[];
+  recommended_actions: string[];
 }
 
 export type AnalysisType = 'phishing' | 'logs';

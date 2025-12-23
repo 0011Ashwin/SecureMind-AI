@@ -10,7 +10,6 @@ interface AnalysisResultProps {
 
 export const AnalysisResult: React.FC<AnalysisResultProps> = ({ type, data }) => {
   const isPhishing = type === 'phishing';
-  const phishingData = data as PhishingAnalysis;
   const logData = data as LogAnalysis;
 
   return (
@@ -27,10 +26,10 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({ type, data }) =>
           </h4>
           <div className="flex items-center space-x-2">
             {!isPhishing && (
-              <span className={`w-3 h-3 rounded-full ${logData.suspicious_activity ? 'bg-red-500' : 'bg-emerald-500'}`} title={logData.suspicious_activity ? 'Suspicious activity detected' : 'Normal activity'}></span>
+              <span className={`w-3 h-3 rounded-full ${logData.suspicious_activity ? 'bg-red-500' : 'bg-emerald-500'}`}></span>
             )}
             <p className="text-xl font-semibold text-slate-900">
-              {isPhishing ? phishingData.threat_type : logData.possible_attack}
+              {isPhishing ? (data as PhishingAnalysis).threat_type : logData.possible_attack}
             </p>
           </div>
         </div>
@@ -57,6 +56,26 @@ export const AnalysisResult: React.FC<AnalysisResultProps> = ({ type, data }) =>
             ))}
           </ul>
         </div>
+
+        {/* Grounding Sources */}
+        {isPhishing && (data as PhishingAnalysis).grounding_sources && (data as PhishingAnalysis).grounding_sources!.length > 0 && (
+          <div className="pt-4 border-t border-slate-100">
+            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Reference Sources</h4>
+            <div className="space-y-2">
+              {(data as PhishingAnalysis).grounding_sources!.map((source, idx) => (
+                <a 
+                  key={idx} 
+                  href={source.uri} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block text-xs text-indigo-500 hover:text-indigo-700 truncate"
+                >
+                  {source.title || source.uri}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

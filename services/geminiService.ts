@@ -62,29 +62,32 @@ export class GeminiService {
   }
 
   async analyzePhishing(content: string): Promise<PhishingAnalysis> {
-    const response = await this.ai.models.generateContent({
+    const aiInstance = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+    
+    const response = await aiInstance.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: `You are a cybersecurity analyst. 
-      Task: Analyze the following content for phishing or scam risk.
       
-      Content:
+      TASK:
+      Analyze the following message for phishing, scam, or security risks.
+      
+      MESSAGE CONTENT:
       """
       ${content}
       """
       
-      Instructions:
-      - Determine if the content is malicious or safe.
-      - Classify the threat type.
-      - Assign a risk level: High, Medium, or Low.
-      - Explain the risk in simple, non-technical language.
-      - Suggest clear and actionable safety steps.
+      INSTRUCTIONS:
+      1. Identify if this message is a phishing attempt, a scam, or legitimate.
+      2. Classify the threat type.
+      3. Assign a risk level (High, Medium, Low).
+      4. Provide a simple, clear explanation of your reasoning.
+      5. Suggest actionable steps to stay safe.
       
-      Rules:
-      - Be conservative in classification.
-      - Do not exaggerate risk.
-      - Do not hallucinate facts.
-      - Explanation must be understandable by a non-technical user.`,
+      RULES:
+      - Be conservative. If something looks suspicious, mark as High Risk.
+      - Return structured JSON only.`,
       config: {
+        tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: PHISHING_SCHEMA,
       },
@@ -92,11 +95,24 @@ export class GeminiService {
 
     const text = response.text;
     if (!text) throw new Error("No response from Gemini");
-    return JSON.parse(text);
+    const result: PhishingAnalysis = JSON.parse(text);
+
+    const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+    if (chunks) {
+      result.grounding_sources = chunks
+        .filter((c: any) => c.web)
+        .map((c: any) => ({
+          uri: c.web.uri,
+          title: c.web.title
+        }));
+    }
+
+    return result;
   }
 
   async analyzeLogs(logs: string): Promise<LogAnalysis> {
-    const response = await this.ai.models.generateContent({
+    const aiInstance = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+    const response = await aiInstance.models.generateContent({
       model: "gemini-3-pro-preview",
       contents: `You are a cybersecurity log analysis expert.
       Task: Analyze the following system logs for suspicious or malicious activity.
@@ -111,12 +127,7 @@ export class GeminiService {
       - Infer possible attack types if applicable.
       - Assign a risk level: High, Medium, or Low.
       - Explain findings in simple language.
-      - Suggest mitigation or preventive steps.
-      
-      Rules:
-      - Do not assume attacks unless evidence exists.
-      - Avoid deep technical jargon.
-      - Keep explanations concise.`,
+      - Suggest mitigation or preventive steps.`,
       config: {
         thinkingConfig: { thinkingBudget: 16384 },
         responseMimeType: "application/json",

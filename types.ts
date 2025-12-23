@@ -6,6 +6,7 @@ export interface PhishingAnalysis {
   risk_level: RiskLevel;
   explanation: string;
   recommended_actions: string[];
+  grounding_sources?: { uri: string; title: string }[];
 }
 
 export interface LogAnalysis {
@@ -16,7 +17,7 @@ export interface LogAnalysis {
   recommended_actions: string[];
 }
 
-export type AnalysisType = 'phishing' | 'logs';
+export type AnalysisType = 'phishing' | 'logs' | 'how_it_works';
 
 export interface AppState {
   isAnalyzing: boolean;

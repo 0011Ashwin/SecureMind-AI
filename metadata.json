@@ -1,0 +1,5 @@
+{
+  "name": "SecureMind AI",
+  "description": "A Gemini-powered cybersecurity copilot for GenAI hackthon Hajipur 2025, providing explainable risk assessments.",
+  "requestFramePermissions": []
+}

@@ -9,31 +9,28 @@ interface RiskIndicatorProps {
 export const RiskIndicator: React.FC<RiskIndicatorProps> = ({ level }) => {
   const styles = {
     High: {
-      bg: 'bg-red-950/30',
-      text: 'text-red-500',
-      border: 'border-red-500',
-      icon: '!!'
+      bg: 'bg-red-50 text-red-700 border-red-200',
+      dot: 'bg-red-500',
+      label: 'High Risk'
     },
     Medium: {
-      bg: 'bg-amber-950/30',
-      text: 'text-amber-500',
-      border: 'border-amber-500',
-      icon: '??'
+      bg: 'bg-amber-50 text-amber-700 border-amber-200',
+      dot: 'bg-amber-500',
+      label: 'Medium Risk'
     },
     Low: {
-      bg: 'bg-emerald-950/30',
-      text: 'text-emerald-500',
-      border: 'border-emerald-500',
-      icon: 'OK'
+      bg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      dot: 'bg-emerald-500',
+      label: 'Low Risk'
     },
   };
 
   const style = styles[level];
 
   return (
-    <div className={`flex items-center space-x-3 px-4 py-1.5 border-2 ${style.bg} ${style.text} ${style.border} font-bold text-[10px] pixel-font shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
-      <span>{style.icon}</span>
-      <span className="tracking-tighter">{level} RISK</span>
+    <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${style.bg} transition-all`}>
+      <span className={`w-1.5 h-1.5 rounded-full mr-2 ${style.dot} animate-pulse`}></span>
+      {style.label}
     </div>
   );
 };

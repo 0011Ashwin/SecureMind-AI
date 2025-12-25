@@ -14,8 +14,33 @@ export const Dashboard: React.FC<DashboardProps> = ({ history }) => {
   
   const highRiskPercent = total > 0 ? Math.round((highRisk / total) * 100) : 0;
   
-  const mockTrend = [35, 42, 38, 55, 48, 60, 52];
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  // Calculate real trend data for the last 7 days
+  const getTrendData = () => {
+    const daysLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const now = new Date();
+    const trend = [];
+    const labels = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(now.getDate() - i);
+      const dayName = daysLabels[d.getDay()];
+      const dateString = d.toLocaleDateString();
+      
+      // Count items in history for this specific calendar day
+      const count = history.filter(item => {
+        const itemDate = new Date(item.id.startsWith('17') ? parseInt(item.id) : item.timestamp).toLocaleDateString();
+        return itemDate === dateString;
+      }).length;
+      
+      trend.push(count);
+      labels.push(dayName);
+    }
+    return { trend, labels };
+  };
+
+  const { trend: realTrend, labels: dayLabels } = getTrendData();
+  const maxInTrend = Math.max(...realTrend, 5); // Ensure scale looks okay even with few items
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -45,32 +70,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ history }) => {
         {/* Main Chart Section */}
         <div className="lg:col-span-2 bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h3 className="font-semibold text-gray-800">Threat Detection Trends</h3>
+            <h3 className="font-semibold text-gray-800">Scan Activity (Last 7 Days)</h3>
             <div className="flex items-center space-x-2 text-xs font-medium text-gray-500">
-              <span className="flex items-center space-x-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span><span>Avg</span></span>
-              <span className="flex items-center space-x-1"><span className="w-2 h-2 rounded-full bg-red-500"></span><span>Peaks</span></span>
+              <span className="flex items-center space-x-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span><span>Scans</span></span>
+              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Live Updates</span>
             </div>
           </div>
           <div className="p-6">
-            <div className="h-[240px] flex items-end justify-between space-x-2 relative group">
-              {mockTrend.map((v, i) => (
+            <div className="h-[240px] flex items-end justify-between space-x-3 relative group">
+              {realTrend.map((v, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center group/bar">
                   <div className="relative w-full h-full flex flex-col justify-end">
                     <div 
-                      className="bg-blue-100 group-hover/bar:bg-blue-200 transition-all rounded-t-sm border-t border-blue-300" 
-                      style={{ height: `${v}%` }}
+                      className="bg-blue-500 group-hover/bar:bg-blue-600 transition-all rounded-t-sm border-t border-blue-300" 
+                      style={{ height: `${(v / maxInTrend) * 100}%` }}
                     >
-                      <div className="opacity-0 group-hover/bar:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap z-20 transition">
-                        Value: {v}
+                      <div className="opacity-0 group-hover/bar:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] py-1 px-2 rounded whitespace-nowrap z-20 transition shadow-lg">
+                        {v} {v === 1 ? 'Scan' : 'Scans'}
                       </div>
                     </div>
                   </div>
-                  <span className="mt-3 text-[10px] font-semibold text-gray-400 uppercase">{days[i]}</span>
+                  <span className="mt-3 text-[10px] font-bold text-gray-400 uppercase">{dayLabels[i]}</span>
                 </div>
               ))}
               {/* Grid Lines */}
-              <div className="absolute inset-x-0 top-0 h-full flex flex-col justify-between pointer-events-none opacity-20">
-                {[...Array(5)].map((_, i) => <div key={i} className="w-full border-t border-gray-300"></div>)}
+              <div className="absolute inset-x-0 top-0 h-full flex flex-col justify-between pointer-events-none opacity-10">
+                {[...Array(5)].map((_, i) => <div key={i} className="w-full border-t border-gray-400"></div>)}
               </div>
             </div>
           </div>
@@ -97,13 +122,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ history }) => {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-4xl font-bold text-gray-900">{highRiskPercent}%</span>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Risk Factor</span>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">High Risk Ratio</span>
               </div>
             </div>
             <div className="mt-8 w-full p-4 bg-gray-50 rounded-lg border border-gray-100 text-center">
-              <p className="text-xs font-semibold text-gray-600 uppercase tracking-tighter">Status Update</p>
+              <p className="text-xs font-semibold text-gray-600 uppercase tracking-tighter">Status Summary</p>
               <p className="text-sm font-bold text-gray-800 mt-1">
-                {highRiskPercent > 30 ? 'Attention Required' : 'Stable Environment'}
+                {total === 0 ? 'Awaiting Data' : (highRiskPercent > 30 ? 'Attention Required' : 'Stable Environment')}
               </p>
             </div>
           </div>

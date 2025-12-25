@@ -17,11 +17,20 @@ export interface LogAnalysis {
   recommended_actions: string[];
 }
 
-export type AnalysisType = 'phishing' | 'logs' | 'how_it_works';
+export interface HistoryItem {
+  id: string;
+  timestamp: string;
+  type: 'phishing' | 'logs';
+  input: string;
+  result: PhishingAnalysis | LogAnalysis;
+}
+
+export type AnalysisType = 'phishing' | 'logs' | 'dashboard' | 'history' | 'how_it_works';
 
 export interface AppState {
   isAnalyzing: boolean;
   result: PhishingAnalysis | LogAnalysis | null;
   error: string | null;
   activeTab: AnalysisType;
+  history: HistoryItem[];
 }

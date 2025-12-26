@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { AnalysisResult } from './components/AnalysisResult';
@@ -10,7 +9,7 @@ import { AppState, AnalysisType, HistoryItem } from './types';
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
-    const saved = localStorage.getItem('securemind_history');
+    const saved = localStorage.getItem('sentinel_history');
     return {
       isAnalyzing: false,
       result: null,
@@ -23,7 +22,7 @@ const App: React.FC = () => {
   const [input, setInput] = useState('');
 
   useEffect(() => {
-    localStorage.setItem('securemind_history', JSON.stringify(state.history));
+    localStorage.setItem('sentinel_history', JSON.stringify(state.history));
   }, [state.history]);
 
   const handleAnalyze = async () => {
@@ -61,7 +60,7 @@ const App: React.FC = () => {
       setState(prev => ({ 
         ...prev, 
         isAnalyzing: false, 
-        error: err.message || "Failed to establish secure connection with AI core." 
+        error: err.message || "Uplink failed. Check your API configuration." 
       }));
     }
   };
@@ -80,20 +79,7 @@ const App: React.FC = () => {
     setInput(item.input);
   };
 
-  const samplePhishing = `From: support@secure-paypal-access.com
-Subject: URGENT: Your account access is restricted
-Dear valued member, 
-We have detected suspicious activity. Please visit the secure link below to verify your identity or your account will be closed permanently: 
-https://verification-paypal-portal.com/auth/login?token=293849
-Thank you, PayPal Security Team.`;
-
-  const sampleLogs = `2024-05-21 08:31:12 Connection: from 185.22.14.88:44321
-2024-05-21 08:31:13 SSH: Failed password for root from 185.22.14.88 port 44321 ssh2
-2024-05-21 08:31:15 SSH: Failed password for root from 185.22.14.88 port 44321 ssh2
-2024-05-21 08:31:18 SSH: Failed password for admin from 185.22.14.88 port 44321 ssh2
-2024-05-21 08:31:21 SSH: Failed password for user1 from 185.22.14.88 port 44321 ssh2`;
-
-  const renderContent = () => {
+  const renderTabContent = () => {
     switch (state.activeTab) {
       case 'dashboard':
         return <Dashboard history={state.history} />;
@@ -104,83 +90,80 @@ Thank you, PayPal Security Team.`;
       case 'phishing':
       case 'logs':
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-gray-900">
-                  {state.activeTab === 'phishing' ? 'Analyze Threat' : 'Log Investigation'}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            {/* Input Pane */}
+            <div className="bg-white border border-[#dadce0] rounded-lg shadow-sm flex flex-col min-h-[500px]">
+              <div className="px-6 py-4 border-b border-[#dadce0] flex items-center justify-between">
+                <h3 className="font-semibold text-[#202124]">
+                  {state.activeTab === 'phishing' ? 'Phishing Analysis Core' : 'Security Log Analysis'}
                 </h3>
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Input Analysis</span>
+                <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">ONLINE</span>
               </div>
-              
-              <div className="space-y-4">
+              <div className="p-6 flex-1 flex flex-col">
+                <p className="text-xs text-[#5f6368] mb-4">
+                  {state.activeTab === 'phishing' 
+                    ? "Paste a suspicious email, SMS, or URL. Our AI will analyze the intent and identify risk factors." 
+                    : "Paste system authentication or activity logs. We'll look for brute-force, lateral movement, or anomalies."}
+                </p>
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={
-                    state.activeTab === 'phishing'
-                      ? "Paste suspicious email, SMS, or URL here..."
-                      : "Paste server access logs, auth logs, or activity logs here..."
-                  }
-                  className="w-full h-80 p-5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-sm font-medium text-gray-800 leading-relaxed resize-none"
+                  placeholder="Insert raw content here..."
+                  className="w-full flex-1 p-4 bg-[#f8f9fa] border border-[#dadce0] rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none font-mono text-sm leading-relaxed resize-none transition-all"
                 />
-                
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <button
-                    onClick={() => setInput(state.activeTab === 'phishing' ? samplePhishing : sampleLogs)}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center space-x-2 p-2 rounded hover:bg-blue-50 transition"
+                <div className="mt-6 flex items-center justify-between">
+                   <button
+                    onClick={() => setInput(state.activeTab === 'phishing' 
+                      ? "Subject: ALERT! Account Suspended.\nPlease verify your login at http://secure-portal-auth.net/verify to restore access." 
+                      : "2024-05-22 10:11:02 SSH: Invalid user login from 192.168.4.12 port 22\n2024-05-22 10:11:05 SSH: Invalid user login from 192.168.4.12 port 22\n2024-05-22 10:11:09 SSH: Successful login for root from 192.168.4.12 port 22")}
+                    className="text-xs font-semibold text-blue-600 hover:underline"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    <span>Insert Demo Data</span>
+                    Load Sample Case
                   </button>
                   <button
                     onClick={handleAnalyze}
                     disabled={state.isAnalyzing || !input.trim()}
-                    className={`px-8 py-3 rounded-lg font-bold text-sm shadow-md transition-all ${
-                      state.isAnalyzing || !input.trim()
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
-                        : 'bg-[#1a73e8] text-white hover:bg-blue-700 active:scale-95'
-                    }`}
+                    className="gcp-btn-primary shadow-sm active:scale-95 disabled:opacity-50 flex items-center space-x-2"
                   >
-                    {state.isAnalyzing ? 'Analyzing with Gemini...' : 'Run Analysis Core'}
+                    {state.isAnalyzing && (
+                      <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    )}
+                    <span>{state.isAnalyzing ? 'Analyzing...' : 'Execute Analysis'}</span>
                   </button>
                 </div>
               </div>
             </div>
 
+            {/* Results Pane */}
             <div className="space-y-6">
               {!state.isAnalyzing && !state.result && !state.error && (
-                <div className="bg-white rounded-lg border border-gray-200 p-20 text-center flex flex-col items-center shadow-sm opacity-60">
-                  <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center text-blue-300 mb-6">
-                    <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                <div className="h-full bg-white border border-[#dadce0] rounded-lg border-dashed p-20 text-center flex flex-col items-center justify-center opacity-40">
+                  <div className="p-4 bg-gray-50 rounded-full mb-4">
+                     <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                   </div>
-                  <h3 className="text-gray-900 font-bold mb-2">Ready for Analysis</h3>
-                  <p className="text-gray-500 text-sm">Provide input in the terminal to generate a security assessment report.</p>
+                  <h3 className="text-gray-900 font-bold mb-1 text-lg">Analysis Pending</h3>
+                  <p className="text-gray-500 text-sm max-w-xs">Run a scan to see real-time AI insights and threat modeling.</p>
                 </div>
               )}
 
               {state.error && (
-                <div className="bg-white border-l-4 border-red-500 p-6 shadow-sm rounded-lg">
-                  <div className="flex items-center space-x-3 text-red-600 mb-4">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <h3 className="font-bold uppercase tracking-widest text-xs">Analysis Failure</h3>
-                  </div>
-                  <p className="text-gray-700 text-sm font-medium">{state.error}</p>
+                <div className="bg-red-50 border border-red-200 p-6 rounded-lg text-red-700">
+                  <h4 className="font-bold flex items-center mb-2">
+                    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                    Analysis Interrupted
+                  </h4>
+                  <p className="text-sm">{state.error}</p>
                 </div>
               )}
 
               {state.isAnalyzing && (
-                <div className="bg-white rounded-lg border border-gray-200 p-20 flex flex-col items-center justify-center text-center space-y-6 shadow-sm">
-                   <div className="relative w-16 h-16">
-                      <div className="absolute inset-0 border-4 border-blue-100 rounded-full"></div>
-                      <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
-                   </div>
-                   <div>
-                      <h3 className="text-lg text-gray-900 font-bold">Processing Stream</h3>
-                      <p className="text-gray-500 text-sm mt-1 max-w-xs mx-auto">
-                        Generating explainable risk assessment using Gemini Advanced Reasoning Core...
-                      </p>
-                   </div>
+                <div className="bg-white border border-[#dadce0] rounded-lg p-12 text-center flex flex-col items-center justify-center space-y-4 shadow-sm h-full">
+                  <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+                  <h3 className="font-bold text-[#202124]">Processing with Gemini</h3>
+                  <p className="text-xs text-[#5f6368] max-w-xs">Connecting to Google AI infrastructure for deep reasoning and context synthesis...</p>
                 </div>
               )}
 
@@ -197,41 +180,35 @@ Thank you, PayPal Security Team.`;
 
   return (
     <Layout>
-      <header className="mb-10">
+      <div className="mb-10">
         <div className="flex items-center space-x-3 mb-2">
-           <span className="text-sm font-bold text-blue-600 uppercase tracking-widest">Unified AI Copilot</span>
-           <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-           <span className="text-sm font-bold text-gray-400">Enterprise Security</span>
+           <h1 className="text-2xl font-bold text-[#202124]">Security Command Center</h1>
+           <span className="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
+           <span className="text-sm font-medium text-[#5f6368]">Cybersecurity Copilot</span>
         </div>
-        <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight leading-none mb-4">
-           Cybersecurity Command Center
-        </h2>
-        <p className="text-gray-600 max-w-2xl text-lg font-medium leading-relaxed">
-          Analyze phishing threats and system log anomalies with Google Gemini's reasoning engine. Built for transparency and explainable risk mitigation.
+        <p className="text-[#5f6368] max-w-3xl text-sm leading-relaxed">
+          Leverage the power of Gemini's advanced reasoning to automate threat detection, log parsing, and explainable risk modeling in real-time.
         </p>
-      </header>
+      </div>
 
-      {/* Google Style Tabs */}
-      <div className="flex items-center space-x-1 border-b border-gray-200 mb-10 overflow-x-auto scrollbar-hide">
+      {/* Navigation Tabs */}
+      <div className="flex items-center border-b border-[#dadce0] mb-8 overflow-x-auto scrollbar-hide">
         {(['dashboard', 'phishing', 'logs', 'history', 'how_it_works'] as AnalysisType[]).map((tab) => (
           <button
             key={tab}
             onClick={() => handleTabChange(tab)}
-            className={`px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all relative ${
+            className={`px-6 py-4 text-xs font-bold uppercase tracking-wider whitespace-nowrap border-b-2 transition-all duration-150 ${
               state.activeTab === tab
-                ? 'text-[#1a73e8]'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100/50'
+                ? 'border-[#1a73e8] text-[#1a73e8]'
+                : 'border-transparent text-[#5f6368] hover:text-[#202124] hover:bg-gray-100/50'
             }`}
           >
             {tab.replace('_', ' ')}
-            {state.activeTab === tab && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1a73e8]"></div>
-            )}
           </button>
         ))}
       </div>
 
-      {renderContent()}
+      {renderTabContent()}
     </Layout>
   );
 };

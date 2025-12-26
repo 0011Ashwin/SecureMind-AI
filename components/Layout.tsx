@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface LayoutProps {
@@ -7,71 +6,75 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
-      {/* Google Cloud Style Top Bar */}
-      <nav className="bg-[#1a73e8] text-white sticky top-0 z-50 shadow-md">
-        <div className="max-w-[1600px] mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-2">
-              <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white" />
-                <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="font-semibold text-lg tracking-tight">SentinelMind AI</span>
-            </div>
-            <div className="hidden md:flex items-center space-x-1 px-3 py-1 bg-white/10 rounded border border-white/20">
-              <span className="text-xs font-medium opacity-80 uppercase tracking-wider">Project:</span>
-              <span className="text-xs font-bold">hajipur-2025-v1</span>
-              <svg className="w-4 h-4 opacity-60" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
-            </div>
+    <div className="min-h-screen flex flex-col">
+      {/* GCP Style Top Navigation */}
+      <nav className="bg-[#1a73e8] text-white h-12 flex items-center justify-between px-4 sticky top-0 z-[100] shadow-sm">
+        <div className="flex items-center space-x-4">
+          <button className="p-2 hover:bg-white/10 rounded-full transition">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <div className="flex items-center space-x-2">
+            <span className="font-semibold text-lg tracking-tight whitespace-nowrap">SentinelMind AI</span>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <div className="hidden lg:flex items-center space-x-4 text-sm font-medium">
-              <a href="#" className="hover:bg-white/10 px-3 py-1 rounded transition">Dashboard</a>
-              <a href="#" className="hover:bg-white/10 px-3 py-1 rounded transition">IAM & Admin</a>
-              <a href="#" className="hover:bg-white/10 px-3 py-1 rounded transition">Security</a>
-            </div>
-            <div className="h-8 w-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-xs border border-white/20">
-              GA
-            </div>
+          <div className="h-6 w-[1px] bg-white/20 hidden sm:block"></div>
+          
+          <div className="hidden md:flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-3 py-1 rounded cursor-pointer transition border border-white/10">
+            <span className="text-[11px] font-medium opacity-70 uppercase tracking-tighter">Project</span>
+            <span className="text-xs font-bold">sentinel-prod-hajipur</span>
+            <svg className="w-3 h-3 opacity-60" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-3">
+          <div className="hidden lg:flex items-center space-x-4 mr-4">
+            <button className="text-sm font-medium hover:bg-white/10 px-3 py-1 rounded transition">Support</button>
+            <button className="text-sm font-medium hover:bg-white/10 px-3 py-1 rounded transition">Docs</button>
+          </div>
+          <div className="h-8 w-8 rounded-full bg-blue-500 border border-white/30 flex items-center justify-center font-bold text-xs">
+            JD
           </div>
         </div>
       </nav>
 
-      {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Hackathon Header */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <div className="flex items-center space-x-4">
-             <div className="flex items-center space-x-2">
-                <span className="text-gray-900 font-bold">GenAI Hackathon</span>
-                <span className="text-[#ea4335] font-black">Hajipur</span>
-             </div>
-             <div className="h-4 w-[1px] bg-gray-300"></div>
-             <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded">One-Day Event</span>
+      {/* Secondary Hackathon Header */}
+      <div className="bg-white border-b border-[#dadce0] px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+             <span className="text-[#3c4043] font-bold text-sm">GenAI Hackathon</span>
+             <span className="text-[#ea4335] font-black text-sm">Hajipur 2025</span>
           </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <span className="font-medium">Powered by</span>
-            <span className="font-bold text-gray-700">Google AI Studio</span>
-          </div>
+          <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-widest">
+            Prototype
+          </span>
         </div>
-
-        <main>
-          {children}
-        </main>
+        <div className="flex items-center space-x-4 text-[11px] text-[#70757a] font-medium uppercase tracking-wider">
+          <span>Powered by</span>
+          <img src="https://www.gstatic.com/devrel-devsite/prod/v773998f45a16568972a50787e83463991823933c1f24d9d835520a02f3a6167c/developers/images/touchicon-180.png" className="w-4 h-4 grayscale opacity-50" alt="Google" />
+          <span className="font-bold">Google AI Studio</span>
+        </div>
       </div>
 
-      <footer className="mt-20 py-10 bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between text-gray-500 text-xs">
-          <p>© 2025 SentinelMind AI • Built for Google GenAI Hackathon Hajipur</p>
-          <div className="flex items-center space-x-6 mt-4 md:mt-0">
-             <span className="flex items-center space-x-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span className="font-medium text-emerald-700">Gemini 3 Flash Online</span>
-             </span>
-             <a href="#" className="hover:text-blue-600">Privacy</a>
-             <a href="#" className="hover:text-blue-600">Compliance</a>
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto p-6 md:p-8 max-w-[1600px] mx-auto w-full">
+        {children}
+      </main>
+
+      <footer className="bg-white border-t border-[#dadce0] px-8 py-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-[#70757a] text-[11px] font-medium">
+          <div className="flex items-center space-x-6">
+            <p>© 2025 SentinelMind AI</p>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span>Gemini 3 Flash Region: global-us</span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-6 uppercase tracking-widest">
+            <a href="#" className="hover:text-blue-600 transition">Terms</a>
+            <a href="#" className="hover:text-blue-600 transition">Privacy</a>
+            <a href="#" className="hover:text-blue-600 transition">Security Policy</a>
           </div>
         </div>
       </footer>

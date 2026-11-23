@@ -1,14 +1,40 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Gemini Analysis Dashboard
 
-## Run Locally
+## Features
+- Real-time data visualization
+- Interactive analytics dashboard
+- Integration with Gemini AI models
+- Support for multiple data sources
+- Customizable graph configurations
 
-**Prerequisites:**  Node.js..
+## Installation
+To install the project dependencies:
+```bash
+npm install
+```
 
+To start the development server:
+```bash
+npm run dev
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Tech Stack
+- React
+- TypeScript
+- Vite
+- Vitest
+- Mermaid.js
+
+## Project Structure
+```mermaid
+graph TD
+    A[Root] --> B[components]
+    A --> C[pages]
+    A --> D[utils]
+    B --> E[Dashboard]
+    B --> F[Chart]
+    C --> G[Home]
+    C --> H[Analytics]
+    D --> I[helpers]
+    D --> J[constants]
+```
